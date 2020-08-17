@@ -1,7 +1,7 @@
 // ===== packages ===== //
 
 const express = require('express');
-require ('dontenv').config();
+require ('dotenv').config();
 const cors = require('cors');
 
 // ===== global variables ===== //
