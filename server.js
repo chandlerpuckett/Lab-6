@@ -17,10 +17,8 @@ app.get('/location', (request,response) => {
   const jsonLocationObject = require('./data/location.json');
   const constructedLocation = new Location(jsonLocationObject);
 
-  console.log(request.query);
   response.send(constructedLocation);
 });
-
 
 
 // ===== constructor function ===== //
@@ -35,8 +33,12 @@ function Location (jsonLocationObject){
 
 // ===== other functions ===== //
 
+function captureSearch (request){
+  let searchBarInput = request.query;
+  console.log('USER SEARCHED FOR: ', searchBarInput);
+}
 
-
+captureSearch();
 
 // ===== start the server ===== //
 
