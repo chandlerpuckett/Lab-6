@@ -13,8 +13,7 @@ app.use(cors());
 
 // ===== routes ===== //
 
-app.get('/location', (request ,response) => {
-
+app.get('/location', (request,response) => {
   const jsonLocationObject = require('./data/location.json');
   const constructedLocation = new Location(jsonLocationObject);
 
@@ -25,8 +24,8 @@ app.get('/location', (request ,response) => {
 
 // ===== constructor function ===== //
 
-function Location (request , jsonLocationObject){
-  this.search_query = request ;
+function Location (jsonLocationObject){
+  this.search_query = $('#input-search');
   this.formatted_query = jsonLocationObject[0].display_name;
   this.latitude = jsonLocationObject[0].lat;
   this.longitude = jsonLocationObject[0].lon;
