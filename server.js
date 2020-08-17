@@ -17,6 +17,7 @@ app.get('/location', (request,response) => {
   const jsonLocationObject = require('./data/location.json');
   const constructedLocation = new Location(jsonLocationObject);
 
+  console.log(request.query);
   response.send(constructedLocation);
 });
 
