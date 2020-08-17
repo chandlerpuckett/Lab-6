@@ -15,9 +15,8 @@ app.use(cors());
 
 app.get('/location', (request,response) => {
   const jsonLocationObject = require('./data/location.json');
-  const constructedLocation = new Location(jsonLocationObject, city);
-
   const city = request.query.city;
+  const constructedLocation = new Location(city,jsonLocationObject);
 
   response.send(constructedLocation);
 });
