@@ -33,12 +33,6 @@ function Location (jsonLocationObject){
 
 // ===== other functions ===== //
 
-function captureSearch (request){
-  let searchBarInput = request.query;
-  console.log('USER SEARCHED FOR: ', searchBarInput);
-}
-
-captureSearch();
 
 // ===== start the server ===== //
 
