@@ -25,7 +25,7 @@ app.get('/location', (request,response) => {
 // ===== constructor function ===== //
 
 function Location (jsonLocationObject){
-  this.search_query = $('#input-search');
+  // this.search_query = ;
   this.formatted_query = jsonLocationObject[0].display_name;
   this.latitude = jsonLocationObject[0].lat;
   this.longitude = jsonLocationObject[0].lon;
