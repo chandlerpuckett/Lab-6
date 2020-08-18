@@ -26,7 +26,7 @@ app.get('/location', (request,response) => {
 
 app.get('/weather', (request,response) => {
   const jsonWeatherObject = require('./data/weather.json');
-  const weatherArr = [];
+  let weatherArr = [];
 
   jsonWeatherObject.data.forEach(forecast => {
     weatherArr.push(new Weather(forecast));
