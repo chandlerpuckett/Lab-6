@@ -14,8 +14,6 @@ app.use(cors());
 // ===== routes ===== //
 
 app.get('/location', (request,response) => {
-  let city = request.query.city;
-  errorMessage(city,response);
 
   const jsonLocationObject = require('./data/location.json');
   const city = request.query.city;
@@ -26,8 +24,6 @@ app.get('/location', (request,response) => {
 });
 
 app.get('/weather', (request,response) => {
-  let city = request.query.city;
-  errorMessage(city,response);
 
   const jsonWeatherObject = require('./data/weather.json');
   new Weather (jsonWeatherObject);
@@ -61,12 +57,14 @@ function Weather (jsonWeatherObject){
 
 // ===== other functions ===== //
 
+
 function errorMessage (request,response) {
-  if (request !== 'lynnwood'){
+  if (request.query.city !== 'lynnwood'){
     return response.status(500).send('try Lynwood!');
   }
 }
 
+errorMessage();
 
 // ===== start the server ===== //
 
