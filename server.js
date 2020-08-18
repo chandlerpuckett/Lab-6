@@ -14,28 +14,26 @@ app.use(cors());
 // ===== routes ===== //
 
 app.get('/location', (request,response) => {
-
-  if (request.query.city !== 'lynnwood'){
-    errorMessage(request,response);
-  }
+  let city = request.query.city;
+  errorMessage(city,response);
 
   const jsonLocationObject = require('./data/location.json');
   const city = request.query.city;
   const constructedLocation = new Location(city,jsonLocationObject);
 
   response.send(constructedLocation);
+
 });
 
 app.get('/weather', (request,response) => {
-
-  if (request.query.city !== 'lynnwood'){
-    errorMessage(request,response);
-  }
+  let city = request.query.city;
+  errorMessage(city,response);
 
   const jsonWeatherObject = require('./data/weather.json');
   new Weather (jsonWeatherObject);
 
   response.send(weatherArray);
+
 
 });
 
