@@ -40,10 +40,12 @@ function Location (city, jsonLocationObject){
 }
 
 function Weather (jsonWeatherObject){
-  for (let i of jsonWeatherObject.data){
+
+  for (let i in jsonWeatherObject.data){
     this.forecast = jsonWeatherObject.data[i].weather.description;
-    this.time = jsonWeatherObject.data[i].valid_Date;
+    this.time = jsonWeatherObject.data[i].datetime;
   }
+
 }
 
 // ===== other functions ===== //
