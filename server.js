@@ -32,7 +32,7 @@ app.get('/weather', (request,response) => {
     weatherArr.push(new Weather(forecast));
   })
 
-  response.send(weatherArray);
+  response.send(weatherArr);
 
 });
 
@@ -47,8 +47,6 @@ function Location (city, jsonLocationObject){
   this.latitude = jsonLocationObject[0].lat;
   this.longitude = jsonLocationObject[0].lon;
 }
-
-let weatherArray = [];
 
 function Weather (jsonWeatherObject){
   this.forecast = jsonWeatherObject.weather.description;
