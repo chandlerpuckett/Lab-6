@@ -18,6 +18,7 @@ function sendLocation (request,response){
   const jsonLocationObject = require('./data/location.json');
   const city = request.query.city;
 
+  // take out for lab-07 work
   if (city !== 'lynnwood'){
     return response.status(500).send('we only have `Lynnwood`');
   }
