@@ -16,7 +16,7 @@ app.use(cors());
 app.get('/location', (request,response) => {
 
   if (request.query.city !== 'lynnwood'){
-    errorMessage(request);
+    errorMessage(request,response);
   } else {
     const jsonLocationObject = require('./data/location.json');
     const city = request.query.city;
@@ -30,7 +30,7 @@ app.get('/location', (request,response) => {
 app.get('/weather', (request,response) => {
 
   if (request.query.city !== 'lynwood'){
-    errorMessage(request);
+    errorMessage(request,response);
   } else {
     const jsonWeatherObject = require('./data/weather.json');
     new Weather (jsonWeatherObject);
@@ -66,7 +66,7 @@ function Weather (jsonWeatherObject){
 
 // ===== other functions ===== //
 
-function errorMessage (request) {
+function errorMessage (request, response) {
   if (request.query.city !== 'lynnwood'){
     return response.status(500).send('try Lynwood!');
   }
