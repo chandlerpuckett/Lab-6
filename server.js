@@ -15,28 +15,25 @@ app.use(cors());
 
 app.get('/location', (request,response) => {
 
-  if (request.query.city !== 'lynnwood'){
-    errorMessage(request,response);
-  } else {
-    const jsonLocationObject = require('./data/location.json');
-    const city = request.query.city;
-    const constructedLocation = new Location(city,jsonLocationObject);
+  const jsonLocationObject = require('./data/location.json');
+  const city = request.query.city;
+  const constructedLocation = new Location(city,jsonLocationObject);
 
-    response.send(constructedLocation);
-  }
+  response.send(constructedLocation);
+
 
 });
 
 app.get('/weather', (request,response) => {
+  const jsonWeatherObject = require('./data/weather.json');
+  const weatherArr = [];
 
-  if (request.query.city !== 'lynwood'){
-    errorMessage(request,response);
-  } else {
-    const jsonWeatherObject = require('./data/weather.json');
-    new Weather (jsonWeatherObject);
+  jsonWeatherObject.data.forEach(forecast => {
+    weatherArr.push(new Weather(forecast));
+  })
 
-    response.send(weatherArray);
-  }
+  response.send(weatherArray);
+
 });
 
 
@@ -54,14 +51,8 @@ function Location (city, jsonLocationObject){
 let weatherArray = [];
 
 function Weather (jsonWeatherObject){
-
-  for (let i in jsonWeatherObject.data){
-    this.forecast = jsonWeatherObject.data[i].weather.description;
-    this.time = jsonWeatherObject.data[i].datetime;
-
-    weatherArray.push(this.forecast, this.time);
-  }
-
+  this.forecast = jsonWeatherObject.weather.description;
+  this.time = jsonWeatherObject.valid_date;
 }
 
 // ===== other functions ===== //
