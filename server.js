@@ -26,12 +26,15 @@ app.get('/location', (request,response) => {
 app.get('/weather', (request,response) => {
 
   const jsonWeatherObject = require('./data/weather.json');
-  new Weather (jsonWeatherObject);
+  const constructedWeather = new Weather (jsonWeatherObject);
 
-  response.send(weatherArray);
+  response.send(constructedWeather);
 
 
 });
+
+app.get('/location', errorMessage);
+app.get('/weather',errorMessage);
 
 
 // ===== constructor function ===== //
@@ -43,9 +46,10 @@ function Location (city, jsonLocationObject){
   this.longitude = jsonLocationObject[0].lon;
 }
 
-let weatherArray = [];
+
 
 function Weather (jsonWeatherObject){
+  let weatherArray = [];
 
   for (let i in jsonWeatherObject.data){
     this.forecast = jsonWeatherObject.data[i].weather.description;
@@ -53,18 +57,16 @@ function Weather (jsonWeatherObject){
 
     weatherArray.push(this.forecast, this.time);
   }
+  return weatherArray;
 }
 
 // ===== other functions ===== //
-
 
 function errorMessage (request,response) {
   if (request.query.city !== 'lynnwood'){
     return response.status(500).send('try Lynwood!');
   }
 }
-
-errorMessage();
 
 // ===== start the server ===== //
 
