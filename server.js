@@ -3,6 +3,7 @@
 const express = require('express');
 require ('dotenv').config();
 const cors = require('cors');
+const superagent = require('superagent');
 const { response } = require('express');
 
 // ===== global variables ===== //
@@ -18,22 +19,14 @@ function sendLocation (request,response){
   const jsonLocationObject = require('./data/location.json');
   const city = request.query.city;
 
-  // take out ffasdkaksdgkands ksjksdkdskd lab7
-  if (city !== 'lynnwood'){
-    return response.status(500).send('we only have `Lynnwood`');
-  }
-
   const constructedLocation = new Location(city,jsonLocationObject);
   response.send(constructedLocation);
 }
 
 function sendWeather (request, response){
   const jsonWeatherObject = require('./data/weather.json');
-  let weatherArr = [];
 
-  jsonWeatherObject.data.forEach(forecast => {
-    weatherArr.push(new Weather(forecast));
-  })
+  let weatherArr = jsonWeatherObject.data.map(construct => new Weather(construct));
 
   response.send(weatherArr);
 }
