@@ -16,7 +16,7 @@ app.use(cors());
 app.get('/location', (request,response) => {
 
   if (request.query.city !== 'lynnwood'){
-    errorMessage(request,response);
+    errorMessage(request);
   } else {
     const jsonLocationObject = require('./data/location.json');
     const city = request.query.city;
@@ -30,12 +30,12 @@ app.get('/location', (request,response) => {
 app.get('/weather', (request,response) => {
 
   if (request.query.city !== 'lynwood'){
-    errorMessage(request,response);
+    errorMessage(request);
   } else {
     const jsonWeatherObject = require('./data/weather.json');
-    const constructedWeather = new Weather (jsonWeatherObject);
+    new Weather (jsonWeatherObject);
 
-    response.send(constructedWeather);
+    response.send(weatherArray);
   }
 });
 
@@ -51,10 +51,9 @@ function Location (city, jsonLocationObject){
   this.longitude = jsonLocationObject[0].lon;
 }
 
-
+let weatherArray = [];
 
 function Weather (jsonWeatherObject){
-  let weatherArray = [];
 
   for (let i in jsonWeatherObject.data){
     this.forecast = jsonWeatherObject.data[i].weather.description;
@@ -62,12 +61,12 @@ function Weather (jsonWeatherObject){
 
     weatherArray.push(this.forecast, this.time);
   }
-  return weatherArray;
+
 }
 
 // ===== other functions ===== //
 
-function errorMessage (request,response) {
+function errorMessage (request) {
   if (request.query.city !== 'lynnwood'){
     return response.status(500).send('try Lynwood!');
   }
