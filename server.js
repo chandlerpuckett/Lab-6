@@ -56,7 +56,7 @@ function Weather (jsonWeatherObject){
 // ===== other functions ===== //
 
 function errorMessage (request,response) {
-  if (request !== 'lynnwood'){
+  if (request.query.city !== 'lynnwood'){
     return response.status(500).send('try Lynwood!');
   }
 }
