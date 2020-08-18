@@ -23,9 +23,9 @@ app.get('/location', (request,response) => {
 
 app.get('/weather', (request,response) => {
   const jsonWeatherObject = require('./data/weather.json');
-  const constructedWeather = new Weather (jsonWeatherObject);
+  new Weather (jsonWeatherObject);
 
-  response.send(constructedWeather);
+  response.send(weatherArray);
 
 });
 
@@ -39,13 +39,16 @@ function Location (city, jsonLocationObject){
   this.longitude = jsonLocationObject[0].lon;
 }
 
+let weatherArray = [];
+
 function Weather (jsonWeatherObject){
 
   for (let i in jsonWeatherObject.data){
     this.forecast = jsonWeatherObject.data[i].weather.description;
     this.time = jsonWeatherObject.data[i].datetime;
-  }
 
+    weatherArray.push(this.forecast, this.time);
+  }
 }
 
 // ===== other functions ===== //
