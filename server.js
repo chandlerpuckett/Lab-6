@@ -4,14 +4,14 @@ const express = require('express');
 require ('dotenv').config();
 const cors = require('cors');
 const superagent = require('superagent');
-const { response } = require('express');
+const { response, json } = require('express');
 
 // ===== global variables ===== //
 
 const PORT = process.env.PORT || 3003;
 const locationApiKey = process.env.GEOCODE_API_KEY;
 const weatherApiKey = process.env.WEATHER_API_KEY;
-// const trailsApiKey = process.env.TRAILS_API_KEY;
+const trailsApiKey = process.env.TRAIL_API_KEY;
 const app = express();
 app.use(cors());
 
@@ -52,8 +52,26 @@ function sendWeather (request, response){
 
 }
 
+function sendTrail (request,response){
+  let lat = request.query.latitude;
+  let lon = request.query.longitude;
+
+  const urlSearch = `https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${lon}&maxDistance=10&key=${trailsApiKey}`;
+
+  superagent.get(urlSearch)
+    .then(trailData => {
+      const trailPass = trailData.body.trails;
+      response.send(trailPass.map(construct => new Trail(construct)));
+    })
+    .catch(error => {
+      console.log(error);
+      response.status(500).send(error.message);
+    })
+}
+
 app.get('/location', sendLocation);
 app.get('/weather', sendWeather);
+app.get('/trails', sendTrail);
 
 // ===== constructor function ===== //
 
@@ -67,6 +85,19 @@ function Location (userSearch, jsonLocationObject){
 function Weather (jsonWeatherObject){
   this.forecast = jsonWeatherObject.weather.description;
   this.time = jsonWeatherObject.valid_date;
+}
+
+function Trail (jsonTrailObject){
+  this.name = jsonTrailObject.name ;
+  this.location = jsonTrailObject.location ;
+  this.length = jsonTrailObject.length ;
+  this.stars = jsonTrailObject.stars ;
+  this.stars_votes = jsonTrailObject.starVotes ;
+  this.summary = jsonTrailObject.summary ;
+  this.trail_url = jsonTrailObject.url ;
+  this.conditions = jsonTrailObject.conditionStatus ;
+  this.condition_date = jsonTrailObject.conditionDate ;
+  this.condition_time = jsonTrailObject.conditionDate ;
 }
 
 // ===== start the server ===== //
