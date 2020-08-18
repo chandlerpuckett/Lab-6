@@ -13,18 +13,20 @@ app.use(cors());
 
 // ===== routes ===== //
 
-app.get('/location', (request,response) => {
 
+function sendLocation (request,response){
   const jsonLocationObject = require('./data/location.json');
   const city = request.query.city;
+
+  if (city !== 'lynnwood'){
+    return response.status(500).send('we only have `Lynnwood`');
+  }
+
   const constructedLocation = new Location(city,jsonLocationObject);
-
   response.send(constructedLocation);
+}
 
-
-});
-
-app.get('/weather', (request,response) => {
+function sendWeather (request, response){
   const jsonWeatherObject = require('./data/weather.json');
   let weatherArr = [];
 
@@ -33,11 +35,10 @@ app.get('/weather', (request,response) => {
   })
 
   response.send(weatherArr);
+}
 
-});
-
-
-
+app.get('/location', sendLocation);
+app.get('/weather', sendWeather);
 
 // ===== constructor function ===== //
 
@@ -51,14 +52,6 @@ function Location (city, jsonLocationObject){
 function Weather (jsonWeatherObject){
   this.forecast = jsonWeatherObject.weather.description;
   this.time = jsonWeatherObject.valid_date;
-}
-
-// ===== other functions ===== //
-
-function errorMessage (request, response) {
-  if (request.query.city !== 'lynnwood'){
-    return response.status(500).send('try Lynwood!');
-  }
 }
 
 // ===== start the server ===== //
