@@ -17,7 +17,6 @@ app.use(cors());
 
 // ===== routes ===== //
 
-
 function sendLocation (request,response){
   const userSearch = request.query.city;
   const urlSearch = `https://us1.locationiq.com/v1/search.php?key=${locationApiKey}&q=${userSearch}&format=json`;
