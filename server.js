@@ -9,7 +9,6 @@ const cors = require('cors');
 
 const superagent = require('superagent');
 const { response, json } = require('express');
-
 const pg = require('pg');
 
 // ===== global variables ===== //
@@ -30,6 +29,8 @@ client.on('error',(error) => console.error(error));
 // ===== routes ===== //
 
 function checkSql (request,response) {
+
+  // client.query('SELECT * FROM user_search WHERE search_query = $1');
 
   const userSearch = request.query.city;
   const queryCheck = 'SELECT * FROM user_search;';
@@ -129,6 +130,7 @@ function sendTrail (request,response){
     })
 }
 
+// app.get('/location', sendLocationToApi);
 app.get('/location', checkSql);
 app.get('/weather', sendWeather);
 app.get('/trails', sendTrail);
