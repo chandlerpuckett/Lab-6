@@ -1,10 +1,16 @@
+'use strict';
+
+// TODO: switch from 16-day to 8 day forecast
 // ===== packages ===== //
 
 const express = require('express');
 require ('dotenv').config();
 const cors = require('cors');
+
 const superagent = require('superagent');
 const { response, json } = require('express');
+
+const pg = require('pg');
 
 // ===== global variables ===== //
 
@@ -12,20 +18,73 @@ const PORT = process.env.PORT || 3003;
 const locationApiKey = process.env.GEOCODE_API_KEY;
 const weatherApiKey = process.env.WEATHER_API_KEY;
 const trailsApiKey = process.env.TRAIL_API_KEY;
+const databaseUrl = process.env.DATABASE_URL;
+
+
 const app = express();
 app.use(cors());
 
+const client = new pg.Client(databaseUrl);
+client.on('error',(error) => console.error(error));
+
 // ===== routes ===== //
 
-function sendLocation (request,response){
+function checkSql (request,response) {
+
+  const userSearch = request.query.city;
+  const queryCheck = 'SELECT * FROM user_search;';
+
+  client.query(queryCheck)
+
+    .then(fromSql => {
+
+      let counter = 0;
+      for (let value of fromSql.rows){
+
+        if (value.search_query === userSearch){
+          console.log('PULLED FROM SERVER: ', value);
+          response.send(value);
+          break;
+
+        } else if (counter === fromSql.rows.length - 1){
+          sendLocationToApi(request,response);
+        }
+        counter++;
+      }
+    })
+}
+
+
+function sendLocationToApi (request,response){
+
   const userSearch = request.query.city;
   const urlSearch = `https://us1.locationiq.com/v1/search.php?key=${locationApiKey}&q=${userSearch}&format=json`;
 
+  const queryString = 'INSERT INTO user_search (search_query, latitude, longitude,formatted_query) VALUES ($1,$2,$3,$4)';
+
   superagent.get(urlSearch)
+
     .then(locationIq => {
       const locationArray = locationIq.body;
       const constructedLocation = new Location(userSearch,locationArray);
-      response.send(constructedLocation);
+
+      const queryArray =
+        [ constructedLocation.search_query,
+          constructedLocation.latitude,
+          constructedLocation.longitude,
+          constructedLocation.formatted_query
+        ];
+
+      // pushes to database //
+      client.query(queryString,queryArray)
+        .then( () => {
+          console.log ('PULLED FROM THE API: ',constructedLocation)
+          response.send(constructedLocation);
+        })
+        .catch(error => {
+          console.error(error);
+          response.status(500).send('the SQL insertion failed');
+        })
     })
     .catch(error => {
       console.log(error);
@@ -42,6 +101,8 @@ function sendWeather (request, response){
   superagent.get(urlSearch)
     .then(weatherData => {
       const weatherPass = weatherData.body.data;
+      // TODO: slice array (0,8) to reduce amount of days sent
+
       response.send(weatherPass.map(construct => new Weather(construct)));
     })
     .catch(error => {
@@ -68,11 +129,11 @@ function sendTrail (request,response){
     })
 }
 
-app.get('/location', sendLocation);
+app.get('/location', checkSql);
 app.get('/weather', sendWeather);
 app.get('/trails', sendTrail);
 
-// ===== constructor function ===== //
+// ===== constructors / functions ===== //
 
 function Location (userSearch, jsonLocationObject){
   this.search_query = userSearch;
@@ -101,4 +162,7 @@ function Trail (jsonTrailObject){
 
 // ===== start the server ===== //
 
-app.listen(PORT, () => console.log(`we are running on PORT : ${PORT}`));
+client.connect()
+  .then( () => {
+    app.listen(PORT, () => console.log(`we are running on PORT : ${PORT}`));
+  })
