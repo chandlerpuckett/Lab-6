@@ -11,7 +11,6 @@ const superagent = require('superagent');
 const { response, json } = require('express');
 
 const pg = require('pg');
-const e = require('express');
 
 // ===== global variables ===== //
 
@@ -30,27 +29,33 @@ client.on('error',(error) => console.error(error));
 
 // ===== routes ===== //
 
-function getLocationFromDatabase (request,response) {
+function checkSql (request,response) {
 
   const userSearch = request.query.city;
   const queryCheck = 'SELECT * FROM user_search;';
 
   client.query(queryCheck)
 
-    .then (fromSql => {
-      for(let value of fromSql.rows){
-        if(value.search_query === userSearch){
+    .then(fromSql => {
+
+      let counter = 0;
+      for (let value of fromSql.rows){
+
+        if (value.search_query === userSearch){
           console.log('PULLED FROM SERVER: ', value);
           response.send(value);
-          break
+          break;
+
+        } else if (counter === fromSql.rows.length - 1){
+          sendLocationToApi(request,response);
         }
+        counter++;
       }
     })
-    .catch (sendLocation(request,response));
 }
 
 
-function sendLocation (request,response){
+function sendLocationToApi (request,response){
 
   const userSearch = request.query.city;
   const urlSearch = `https://us1.locationiq.com/v1/search.php?key=${locationApiKey}&q=${userSearch}&format=json`;
@@ -73,7 +78,7 @@ function sendLocation (request,response){
       // pushes to database //
       client.query(queryString,queryArray)
         .then( () => {
-          console.log ('PULLED FROM THE API: ')
+          console.log ('PULLED FROM THE API: ',constructedLocation)
           response.send(constructedLocation);
         })
         .catch(error => {
@@ -124,8 +129,7 @@ function sendTrail (request,response){
     })
 }
 
-app.get('/location', getLocationFromDatabase);
-// app.get('/location', sendLocation);
+app.get('/location', checkSql);
 app.get('/weather', sendWeather);
 app.get('/trails', sendTrail);
 
