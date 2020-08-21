@@ -19,6 +19,8 @@ const weatherApiKey = process.env.WEATHER_API_KEY;
 const trailsApiKey = process.env.TRAIL_API_KEY;
 const movieApiKey = process.env.MOVIE_API_KEY;
 const databaseUrl = process.env.DATABASE_URL;
+const yelpApiKey = process.env.YELP_API_KEY;
+const yelpClientId = process.env.YELP_CLIENT_ID;
 
 
 
@@ -150,11 +152,34 @@ function getMovies (request,response){
 
 }
 
+function getYelp (request,response){
+  let lat = request.query.latitude;
+  let lon = request.query.longitude;
+
+  const url = `https://api.yelp.com/v3/businesses/search?term=restaurants&latitude=${lat}&longitude=${lon}&start=${request.query.page*5}`;
+
+  superagent.get(url)
+
+    .set('Authorization', `Bearer ${yelpApiKey}`)
+
+    .then(yelpData => {
+      const yelpSend = yelpData.body.businesses;
+      response.send(yelpSend.map(construct => new Yelp(construct)));
+    })
+    .catch(error => {
+      console.log(error);
+      response.status(500).send(error.message);
+    })
+
+
+}
+
 // app.get('/location', sendLocationToApi);
 app.get('/location', checkSql);
 app.get('/weather', sendWeather);
 app.get('/trails', sendTrail);
 app.get('/movies', getMovies);
+app.get('/yelp', getYelp);
 
 // ===== constructors / functions ===== //
 
@@ -191,6 +216,14 @@ function Movie (jsonMovieObject){
   this.image_url = jsonMovieObject.poster_path;
   this.popularity = jsonMovieObject.popularity;
   this.released_on = jsonMovieObject.release_date;
+}
+
+function Yelp (jsonYelpObject){
+  this.name = jsonYelpObject.name;
+  this.image_url = jsonYelpObject.image_url;
+  this.price = jsonYelpObject.price;
+  this.rating = jsonYelpObject.rating;
+  this.url = jsonYelpObject.url;
 }
 
 // ===== start the server ===== //
