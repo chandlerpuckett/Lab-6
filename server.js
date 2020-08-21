@@ -17,7 +17,9 @@ const PORT = process.env.PORT || 3003;
 const locationApiKey = process.env.GEOCODE_API_KEY;
 const weatherApiKey = process.env.WEATHER_API_KEY;
 const trailsApiKey = process.env.TRAIL_API_KEY;
+const movieApiKey = process.env.MOVIE_API_KEY;
 const databaseUrl = process.env.DATABASE_URL;
+
 
 
 const app = express();
@@ -130,10 +132,29 @@ function sendTrail (request,response){
     })
 }
 
+function getMovies (request,response){
+  const city = request.query.search_query;
+  console.log('req query: ', city)
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${movieApiKey}&language=en-US&query=${city}&page=1&include_adult=false`;
+
+  superagent.get(url)
+    .then(movieData => {
+      const movieSend = movieData.body.results;
+      response.send(movieSend.map(construct => new Movie(construct)));
+
+    })
+    .catch(error => {
+      console.log(error);
+      response.status(500).send(error.message);
+    })
+
+}
+
 // app.get('/location', sendLocationToApi);
 app.get('/location', checkSql);
 app.get('/weather', sendWeather);
 app.get('/trails', sendTrail);
+app.get('/movies', getMovies);
 
 // ===== constructors / functions ===== //
 
@@ -160,6 +181,16 @@ function Trail (jsonTrailObject){
   this.conditions = jsonTrailObject.conditionStatus ;
   this.condition_date = jsonTrailObject.conditionDate ;
   this.condition_time = jsonTrailObject.conditionDate ;
+}
+
+function Movie (jsonMovieObject){
+  this.title = jsonMovieObject.title;
+  this.overview = jsonMovieObject.overview;
+  this.average_votes = jsonMovieObject.vote_average;
+  this.total_votes = jsonMovieObject.vote_count;
+  this.image_url = jsonMovieObject.poster_path;
+  this.popularity = jsonMovieObject.popularity;
+  this.released_on = jsonMovieObject.release_date;
 }
 
 // ===== start the server ===== //
