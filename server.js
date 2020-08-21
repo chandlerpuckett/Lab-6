@@ -20,9 +20,6 @@ const trailsApiKey = process.env.TRAIL_API_KEY;
 const movieApiKey = process.env.MOVIE_API_KEY;
 const databaseUrl = process.env.DATABASE_URL;
 const yelpApiKey = process.env.YELP_API_KEY;
-const yelpClientId = process.env.YELP_CLIENT_ID;
-
-
 
 const app = express();
 app.use(cors());
@@ -44,14 +41,18 @@ function checkSql (request,response) {
     .then(fromSql => {
 
       let counter = 0;
-      for (let value of fromSql.rows){
 
+      if (fromSql.rowCount === 0){
+        sendLocationToApi(request,response);
+      }
+
+      for (let value of fromSql.rows){
         if (value.search_query === userSearch){
           console.log('PULLED FROM SERVER: ', value);
           response.send(value);
           break;
 
-        } else if (counter === fromSql.rows.length - 1){
+        } else if (fromSql.rowCount === 0 || counter === fromSql.rows.length - 1){
           sendLocationToApi(request,response);
         }
         counter++;
@@ -170,8 +171,6 @@ function getYelp (request,response){
       console.log(error);
       response.status(500).send(error.message);
     })
-
-
 }
 
 // app.get('/location', sendLocationToApi);
